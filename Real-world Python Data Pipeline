@@ -1,0 +1,85 @@
+Simple real-world Python Data Pipeline example:
+
+Database → Pandas → Cloud Storage
+
+Example pipeline:
+Amazon Web Services RDS → Python Pandas → Amazon Web Services S3
+This is a very common real-time data engineering / automation task.
+
+1. Pipeline Architecture:
+
+Orders Database (Amazon Web Services RDS)
+⬇
+Python Script
+⬇
+Data Cleaning using Pandas
+⬇
+Upload processed file to Amazon Web Services S3
+Used for:
+reporting
+analytics
+dashboards
+
+2. Install Required Libraries:
+
+  pip install pandas sqlalchemy pymysql boto3
+
+Libraries:
+pandas → data processing
+sqlalchemy / pymysql → database connection
+boto3 → interact with AWS services
+3. Step 1 – Fetch Data from Database (AWS RDS)
+Python
+Copy code
+import pandas as pd
+from sqlalchemy import create_engine
+ 
+host = "mydb.xxxxx.us-east-1.rds.amazonaws.com"
+user = "admin"
+password = "password"
+database = "salesdb"
+ 
+engine = create_engine(
+    f"mysql+pymysql://{user}:{password}@{host}/{database}"
+)
+ 
+query = "SELECT * FROM orders"
+ 
+df = pd.read_sql(query, engine)
+ 
+print(df.head())
+This loads the database table into a Pandas DataFrame.
+
+4. Step 2 – Transform Data with Pandas
+Example: calculate total order value.
+
+df["total_price"] = df["price"] * df["quantity"]
+ 
+df = df[df["status"] == "completed"]
+Now the data is cleaned and filtered.
+
+5. Step 3 – Save File Locally
+
+df.to_csv("processed_orders.csv", index=False)
+
+6. Step 4 – Upload File to Cloud (AWS S3)
+import boto3
+ 
+s3 = boto3.client('s3')
+ 
+s3.upload_file(
+    "processed_orders.csv",
+    "sales-data-bucket",
+    "processed_orders.csv"
+)
+ 
+print("File uploaded to S3 successfully")
+Now the processed data is stored in Amazon Web Services S3.
+
+7. Production Workflow
+In real projects this pipeline runs:
+Daily / hourly
+Scheduled using:
+    Cron jobs
+    Apache Software Foundation
+    Amazon Web Services Lambda
