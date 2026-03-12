@@ -1,0 +1,56 @@
+1. Architecture 
+Application → Python Script → AWS Database → Pandas DataFrame
+
+Example:
+Database: Amazon Web Services RDS (MySQL/PostgreSQL)
+Python libraries:
+  pandas
+  sqlalchemy
+  pymysql or psycopg2
+
+2. Install Required Libraries
+  pip install pandas sqlalchemy pymysql
+
+3. Connect to AWS RDS Database
+Example: MySQL database hosted on AWS RDS
+
+  import pandas as pd
+  from sqlalchemy import create_engine
+ 
+# database connection
+  host = "mydb.xxxxxx.us-east-1.rds.amazonaws.com"
+  user = "admin"
+  password = "password"
+  database = "salesdb"
+ 
+engine = create_engine(
+    f"mysql+pymysql://{user}:{password}@{host}/{database}"
+)
+ 
+query = "SELECT * FROM orders"
+ 
+df = pd.read_sql(query, engine)
+ 
+print(df.head())
+
+4. What Happens Here
+1️⃣ Python connects to Amazon Web Services RDS
+2️⃣ Query runs on the database
+3️⃣ Result loads into Pandas DataFrame
+4️⃣ Data can be analyzed / processed
+
+Example:
+
+order_id   customer   price
+1          John       200
+2          Alex       350
+
+5. Real-world Example (Data Pipeline)
+Production workflow:
+Database (Amazon Web Services RDS)
+⬇
+Python + Pandas extracts data
+⬇
+Data cleaning & transformation
+⬇
+Upload to Amazon Web Services S3 or analytics warehouse
